@@ -1,0 +1,30 @@
+<div class="flex flex-row items-center m-4">
+  <div class="basis-1/4 text-2xl">
+    <a routerLink="/home">logo/name</a>
+  </div>
+  <div class="basis-1/2 flex-1 inline-flex">
+    <p-button icon="fa fa-bars" [rounded]="true" [outlined]="true" />
+
+    <p-speedDial [model]="settingsMenu"
+                 class="ml-80 z-50"
+                 hideIcon="fa fa-times"
+                 showIcon="fa fa-cog"
+                 direction="down"></p-speedDial>
+
+    <p-speedDial [model]="userMenu"
+                 class="ml-12 z-50"
+                 hideIcon="fa fa-times"
+                 showIcon="fa fa-user"
+                 direction="down"></p-speedDial>
+
+  </div>
+</div>
+
+<p-sidebar #sidebarRef [(visible)]="sidebarVisible">
+  <ng-template pTemplate="headless">
+    <div class="p-2">
+      <div class="text-2xl border-b-2">Favorite searches</div>
+
+    </div>
+  </ng-template>
+</p-sidebar>

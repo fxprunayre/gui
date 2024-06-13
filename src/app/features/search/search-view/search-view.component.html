@@ -1,0 +1,145 @@
+<div class="relative">
+  <div class="sticky top-0 z-20">
+    <p-inputGroup styleClass="p-10 mb-4 bg-slate-50/30 backdrop-blur-sm">
+      <input [formControl]="queryInput"
+             class="w-full border-2 p-2"
+             type="text"
+             pInputText
+             placeholder="Search ..."
+      />
+      <button type="button" pButton
+              (click)="op.toggle($event)"
+              outlined="true"
+              icon="fa fa-filter"
+              title="Filter">
+        <p-overlayPanel #op>
+          <div class="">
+            Filter your results
+          </div>
+          <div class="flex flex-column gap-3 w-25rem">
+            <div *ngFor="let agg of (searchHits$ | async).aggregations
+                            | keyvalue
+                            | gAggsFilter: aggsConfiguration:'filter':true">
+            <span class="font-medium text-900 block mb-2">
+              {{ agg.key }}
+            </span>
+              <ng-container
+                *ngIf="agg.value.buckets.length && aggsConfiguration[agg.key]?.meta?.filter === true">
+                <ng-container
+                  *ngIf="aggsConfiguration[agg.key]?.meta?.component === 'multiSelect'; else checkbox">
+                  <p-multiSelect
+                    styleClass="w-full"
+                    [options]="agg.value.buckets"
+                    [(ngModel)]="selectedBuckets[agg.key]"
+                    optionLabel="key"
+                    display="chip"
+                    [showClear]="true"/>
+                </ng-container>
+                <ng-template #checkbox>
+                  <a *ngFor="let bucket of agg.value.buckets"
+                     routerLink="/search">
+                    <p-checkbox label="{{bucket.key}} ({{bucket.doc_count}})"
+                                labelStyleClass="text-ellipsis overflow-hidden"></p-checkbox>
+                  </a>
+                </ng-template>
+              </ng-container>
+            </div>
+          </div>
+        </p-overlayPanel>
+      </button>
+      <button pButton icon="fa fa-search"></button>
+    </p-inputGroup>
+  </div>
+
+
+  <div class="flex flex-row">
+    <div class="w-[200px] mr-10">
+    </div>
+    <div *ngIf="(searchHits$ | async).hits"
+         class="flex-grow">
+      <p-paginator
+        [first]="0"
+        [rows]="(searchHits$ | async).hits.hits.length"
+        [totalRecords]="(searchHits$ | async).hits.total.value"
+        [showCurrentPageReport]="true"
+        [showPageLinks]="false"
+        [showJumpToPageDropdown]="false"
+        currentPageReportTemplate="{first} to {last} of {totalRecords}"/>
+    </div>
+  </div>
+  <div class="flex flex-row">
+    <div class="w-[200px] mr-10">
+      <ng-container *ngFor="let agg of (searchHits$ | async).aggregations
+                | keyvalue
+                | gAggsFilter: aggsConfiguration:'filter':undefined">
+        <p-fieldset [toggleable]="true">
+          <ng-template pTemplate="header">
+            <span class="font-medium text-900 text-ellipsis">
+              {{ agg.key }}
+            </span>
+          </ng-template>
+          <ng-container
+            *ngIf="agg.value.buckets.length && aggsConfiguration[agg.key]?.meta?.filter === undefined">
+            <ng-container
+              *ngIf="aggsConfiguration[agg.key]?.meta?.component === 'multiSelect'; else checkbox">
+              <p-multiSelect
+                styleClass="w-full"
+                [options]="agg.value.buckets"
+                [(ngModel)]="selectedBuckets[agg.key]"
+                optionLabel="key"
+                display="chip"
+                [showClear]="true"/>
+            </ng-container>
+            <ng-template #checkbox>
+              <a *ngFor="let bucket of agg.value.buckets"
+                 routerLink="/search">
+                <p-checkbox label="{{bucket.key}} ({{bucket.doc_count}})"
+                            labelStyleClass="text-ellipsis overflow-hidden"></p-checkbox>
+              </a>
+            </ng-template>
+          </ng-container>
+        </p-fieldset>
+      </ng-container>
+    </div>
+    <div class="flex-grow">
+      <p-dataView #dv [value]="(searchHits$ | async)?.hits?.hits">
+        <ng-template pTemplate="list" let-hits>
+          <div class="grid grid-nogutter gap-4">
+            <a class="flex flex-row gap-4"
+               *ngFor="let hit of hits; let first = first"
+               routerLink="/metadata/{{hit._id}}"
+               [state]="hit"
+               title="{{hit._source.resourceAbstractObject?.default}}">
+              <div class="flex-none w-48 h-48 relative rounded-lg border border-gray-300">
+                <p-image class="max-h-48"
+                         preview="false"
+                         imageClass="object-cover w-full h-full"
+                         *ngIf="hit._source.overview?.length > 0"
+                         [src]="hit._source.overview[0]?.url"
+                         [alt]="hit._source.overview[0]?.name"></p-image>
+
+                <p-badge class="absolute bottom-0 left-0 m-2"
+                         *ngIf="hit._source.resourceType"
+                         [value]="hit._source.resourceType[0]"></p-badge>
+              </div>
+              <div class="flex-grow">
+                <div class="text-2xl font-semibold line-clamp-1"
+                     title="{{hit._source.resourceTitleObject.default}}">
+                  {{ hit._source.resourceTitleObject.default }}
+                </div>
+                <div class="w-full">
+                  <p-chip
+                    *ngFor="let range of hit._source.resourceTemporalDateRange"
+                    icon="fa fa-calendar"
+                    label="{{range | gFieldRangeRenderer: 'YYYY-MM-dd'}}">
+                  </p-chip>
+                </div>
+              </div>
+            </a>
+          </div>
+          <p-scrollTop/>
+        </ng-template>
+      </p-dataView>
+    </div>
+  </div>
+</div>
