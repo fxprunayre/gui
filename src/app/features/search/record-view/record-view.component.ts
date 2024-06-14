@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, Pipe, PipeTransform} from '@angular/core';
 import {Button} from "primeng/button";
 import {RouterLink} from "@angular/router";
 import {SearchHit} from "@elastic/elasticsearch/lib/api/types";
@@ -8,6 +8,37 @@ import {TimelineModule} from "primeng/timeline";
 import {ScrollTopModule} from "primeng/scrolltop";
 import {GalleriaModule} from "primeng/galleria";
 import {ImageModule} from "primeng/image";
+import {DataModule} from "../../data/data.module";
+
+@Pipe({
+  name: 'gGetApiLinks',
+  standalone: true,
+  pure: false
+})
+export class GGetApiLinks implements PipeTransform {
+  transform(links: any[]): any {
+    if (!links) {
+      return links;
+    }
+    return links.filter(link =>
+        link.protocol.match(/OGC:.*/i))
+  }
+}
+
+@Pipe({
+  name: 'gGetOtherLinks',
+  standalone: true,
+  pure: false
+})
+export class GGetOtherLinks implements PipeTransform {
+  transform(links: any[]): any {
+    if (!links) {
+      return links;
+    }
+    return links.filter(link =>
+        !link.protocol.match(/OGC:.*/i))
+  }
+}
 
 @Component({
   selector: 'g-record-view',
@@ -22,7 +53,10 @@ import {ImageModule} from "primeng/image";
     DatePipe,
     ScrollTopModule,
     GalleriaModule,
-    ImageModule
+    ImageModule,
+    GGetApiLinks,
+    GGetOtherLinks,
+    DataModule
   ],
   templateUrl: './record-view.component.html',
   styleUrl: './record-view.component.css'

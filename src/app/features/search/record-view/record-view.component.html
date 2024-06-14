@@ -38,8 +38,27 @@
 
       <div class="border-2 p-2 rounded mb-10">
         <div class="text-2xl border-b-2">API</div>
-        <div class="text-2xl border-b-2">Downloads</div>
-        <div class="text-2xl border-b-2">Links</div>
+          <ul>
+              <li *ngFor="let link of record._source.link | gGetApiLinks">
+                <a [href]="link.urlObject.default">{{link.nameObject.default}}</a>
+
+                  <ng-container *ngIf="link.urlObject.default.endsWith('csv')">
+                      <g-data-table source="link.urlObject.default"/>
+                  </ng-container>
+              </li>
+          </ul>
+
+        <div class="text-2xl border-b-2 mt-10">Downloads</div>
+        <div class="text-2xl border-b-2 mt-10">Links</div>
+          <ul>
+              <li *ngFor="let link of record._source.link | gGetOtherLinks">
+                  <a [href]="link.urlObject?.default">{{ link.nameObject?.default }}</a>
+
+                  <ng-container *ngIf="link.urlObject.default.endsWith('csv')">
+                      <g-data-table [source]="link.urlObject.default"/>
+                  </ng-container>
+              </li>
+          </ul>
       </div>
     </div>
 
@@ -72,9 +91,9 @@
       </div>
     </div>
   </div>
-  <div>
+  <!--<div>
     <pre>{{ record | json}}</pre>
-  </div>
+  </div>-->
   <p-scrollTop></p-scrollTop>
 </div>
 

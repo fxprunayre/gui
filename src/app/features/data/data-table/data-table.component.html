@@ -1,0 +1,48 @@
+<ng-container *ngIf="!!data">
+    <div class="block w-5/6">
+        <div class="text-2xl"> Browse data</div>
+
+        <p-table
+            #dt2
+            [value]="data.slice(1)"
+            sortMode="multiple"
+            [style]="{'width':'60vw'}"
+            dataKey="id"
+            [rows]="10"
+            [rowsPerPageOptions]="[10, 25, 50]"
+            [loading]="loading"
+            [paginator]="true"
+        >
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="" *ngFor="let column of data[0]"
+                        pSortableColumn="{{column}}" >
+                        {{ column }}
+                        <p-sortIcon field="{{column}}" />
+                    </th>
+                </tr>
+                <tr>
+                    <th *ngFor="let column of data[0]">
+                        <p-columnFilter
+                                type="text"
+                                field="{{column}}"
+                                placeholder="Search by {{column}}"
+                                ariaLabel="Filter {{ column }}"/>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+                <tr>
+                    <td *ngFor="let column of row" class="truncate">
+                        {{ column }}
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="{{data[0].length}}">No data found.</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</ng-container>
