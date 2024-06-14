@@ -130,6 +130,7 @@
                 <div class="w-full">
                   <p-chip
                     *ngFor="let range of hit._source.resourceTemporalDateRange"
+                    class="pr-2"
                     icon="fa fa-calendar"
                     label="{{range | gFieldRangeRenderer: 'YYYY-MM-dd'}}">
                   </p-chip>
